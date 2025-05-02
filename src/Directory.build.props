@@ -1,0 +1,15 @@
+<Project>
+    <PropertyGroup>
+        <UseArtifactsOutput>true</UseArtifactsOutput>
+    </PropertyGroup>
+
+    <PropertyGroup Label="Paths">
+        <RepoRoot>$(MSBuildThisFileDirectory)../</RepoRoot>
+        <ArtifactsPath>$(RepoRoot)artifacts</ArtifactsPath>
+    </PropertyGroup>
+
+    <PropertyGroup Label="CompilerOptions">
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <WarningLevel>9999</WarningLevel>
+    </PropertyGroup>
+</Project>

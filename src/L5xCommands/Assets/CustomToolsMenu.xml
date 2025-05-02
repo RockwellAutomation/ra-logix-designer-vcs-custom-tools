@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><CustomToolsContent SchemaRevision="1.0">
+	<CustomTool>
+		<Command>@@OUTDIR@@l5xgit.exe</Command>
+		<WorkingDirectory></WorkingDirectory>
+		<Arguments>commit --acd "%project_path%" --pause</Arguments>
+		<ToolName>Commit</ToolName>
+		<StatusBarText>Commit to Git</StatusBarText>
+		<ToolbarIcon IconIndex="0">@@OUTDIR@@\Assets\commit.bmp</ToolbarIcon>
+	</CustomTool>
+	<CustomTool>
+		<Command>@@OUTDIR@@\l5xgit.exe</Command>
+		<WorkingDirectory></WorkingDirectory>
+		<Arguments>difftool --acd "%project_path%"</Arguments>
+		<ToolName>Difftool</ToolName>
+		<StatusBarText>Show most recent commit</StatusBarText>
+		<ToolbarIcon IconIndex="0">@@OUTDIR@@\Assets\difftool.bmp</ToolbarIcon>
+	</CustomTool>
+	<CustomTool>
+		<Command>@@OUTDIR@@\l5xgit.exe</Command>
+		<WorkingDirectory></WorkingDirectory>
+		<Arguments>restoreacd --pause</Arguments>
+		<ToolName>Restore</ToolName>
+		<StatusBarText>Launch l5xgit.exe</StatusBarText>
+		<ToolbarIcon IconIndex="0">@@OUTDIR@@\Assets\pull.bmp</ToolbarIcon>
+	</CustomTool>
+	<CustomTool>
+		<Command>@@OUTDIR@@\l5xgit.exe</Command>
+		<WorkingDirectory></WorkingDirectory>
+		<Arguments>restoreacd --acd "%project_path%" --pause</Arguments>
+		<ToolName>RestoreCurrentFile</ToolName>
+		<StatusBarText>Launch l5xgit.exe</StatusBarText>
+		<ToolbarIcon IconIndex="0">@@OUTDIR@@\Assets\pull.bmp</ToolbarIcon>
+	</CustomTool>
+</CustomToolsContent>

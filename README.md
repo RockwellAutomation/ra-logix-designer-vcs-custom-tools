@@ -7,7 +7,7 @@ The `l5xplode` command enables you to "explode" (decompose) `.L5X` files into a 
 making them easier to version, diff, and review in source control systems like Git. You can also "implode" (recompose) the directory 
 structure back into a valid `.L5X` file.
 
-The `l5xgit` command contains everything l5zxplode does but also additional commands to assist with importing/exporting ACD
+The `l5xgit` command contains everything l5xplode does but also additional commands to assist with importing/exporting ACD
 files to/from a more git-appropriate format, and even commit / diff those changes.
 
 ## Features

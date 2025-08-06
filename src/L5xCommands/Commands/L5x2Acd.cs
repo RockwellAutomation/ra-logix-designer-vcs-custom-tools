@@ -14,35 +14,43 @@ public static class L5x2Acd
     {
         get
         {
-            var acdOption = new Option<string>(
-                aliases: ["--acd", "-a"],
-                description: "Path to the ACD file to write.")
+            var command = new Command("l5x2acd", "Converts a given L5x to an ACD file.");
+
+            var acdOption = new Option<string>("--acd", "-a")
             {
-                IsRequired = true,
+                Description = "Path to the ACD file to write.",
+                Required = true,
+                Validators = 
+                {
+                    optionValue => OptionValidator.FileExtension(optionValue, ".acd"),
+                    OptionValidator.FileExists,
+                }
             };
 
-            var l5xOption = new Option<string>(
-                aliases: ["--l5x", "-l"],
-                description: "Path to the L5X file to read.")
+            var l5xOption = new Option<string>("--l5x", "-l")
             {
-                IsRequired = true
+                Description = "Path to the L5X file to read.",
+                Required = true,
+                Validators = 
+                {
+                    optionValue => OptionValidator.FileExtension(optionValue, ".l5x"),
+                }
             };
 
-            acdOption.AddValidator(result => OptionValidator.FileExtension(result, ".acd"));
-            l5xOption.AddValidator(result => OptionValidator.FileExtension(result, ".l5x"));
-            l5xOption.AddValidator(OptionValidator.FileExists);
+            command.Options.Add(acdOption);
+            command.Options.Add(l5xOption);
 
-            var command = new Command("l5x2acd", "Converts a given L5x to an ACD file.")
+            command.SetAction(parseResult => 
             {
-                acdOption,
-                l5xOption,
-            };
+                var acdPath = parseResult.GetValue(acdOption) ?? throw new ArgumentNullException(nameof(acdOption));
+                var l5xPath = parseResult.GetValue(l5xOption) ?? throw new ArgumentNullException(nameof(l5xOption));
 
-            command.SetHandler(Execute, acdOption, l5xOption);
+                return Execute(acdPath, l5xPath);
+            });
+
             return command;
         }
     }
-
 
     private static async Task Execute(string acdPath, string l5xPath)
     {

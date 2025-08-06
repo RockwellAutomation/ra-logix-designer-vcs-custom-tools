@@ -10,34 +10,41 @@ public static class Implode
     {
         get
         {
-            var dirOption = new Option<string>(
-                aliases: ["--dir", "-d"],
-                description: "The directory containing the XML files to reconstitute the L5X file")
+            var command = new Command("implode", "Reconstitute an equivalent L5X file from the output of the explode command");
+
+            var dirOption = new Option<string>("--dir", "-d")
             {
-                IsRequired = true
+                Description = "The directory containing the XML files to reconstitute the L5X file",
+                Required = true
             };
 
-            var l5xOption = new Option<string>(
-                aliases: ["--l5x", "-l"],
-                description: "The output L5X file path")
+            var l5xOption = new Option<string>("--l5x", "-l")
             {
-                IsRequired = true
+                Description = "The output L5X file path",
+                Required = true,
+                Validators = 
+                {
+                    optionValue => OptionValidator.FileExtension(optionValue, ".l5x"),
+                }
             };
 
-            var forceOption = new Option<bool>(
-                aliases: ["--force", "-f"],
-                description: "Force overwrite of existing files without prompting");
-
-            l5xOption.AddValidator(result => OptionValidator.FileExtension(result, ".l5x"));
-            
-            var command = new Command("implode", "Reconstitute an equivalent L5X file from the output of the explode command")
+            var forceOption = new Option<bool>("--force", "-f")
             {
-                dirOption,
-                l5xOption,
-                forceOption
+                Description = "Force overwrite of existing files without prompting"
             };
 
-            command.SetHandler(Execute, l5xOption, dirOption, forceOption);
+            command.Options.Add(dirOption);
+            command.Options.Add(l5xOption);
+            command.Options.Add(forceOption);
+
+            command.SetAction(parseResult => 
+            {
+                var l5xPath = parseResult.GetValue(l5xOption) ?? throw new ArgumentNullException(nameof(l5xOption));
+                var dirPath = parseResult.GetValue(dirOption) ?? throw new ArgumentNullException(nameof(dirOption));
+                var force = parseResult.GetValue(forceOption);
+
+                Execute(l5xPath, dirPath, force);
+            });
 
             return command;
         }

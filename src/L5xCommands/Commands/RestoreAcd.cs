@@ -14,23 +14,29 @@ public static class RestoreAcd
     {
         get
         {
-            var acdOption = new Option<string?>(
-                aliases: ["--acd", "-a"],
-                description: "Path to the ACD file to overwrite. If not provided will prompt for path."
-            );
+            var command = new Command("restoreacd", "The inverse of the commit command, this command will overwrite the chosen ACD file with one imploded from Git.");
 
-            acdOption.AddValidator(result => OptionValidator.FileExtension(result, ".acd"));
-
-            var command = new Command("restoreacd", "The inverse of the commit command, this command will overwrite the chosen ACD file with one imploded from Git.")
+            var acdOption = new Option<string?>("--acd", "-a")
             {
-                acdOption,
+                Description = "Path to the ACD file to overwrite. If not provided will prompt for path.",
+                Validators = 
+                {
+                    optionValue => OptionValidator.FileExtension(optionValue, ".acd"),
+                }
             };
 
-            command.SetHandler(Execute, acdOption);
+            command.Options.Add(acdOption);
+
+            command.SetAction(parseResult =>
+            {
+                var acdPath = parseResult.GetValue(acdOption);
+
+                return Execute(acdPath);
+            });
+
             return command;
         }
     }
-
 
     private static async Task Execute(string? acdPath)
     {

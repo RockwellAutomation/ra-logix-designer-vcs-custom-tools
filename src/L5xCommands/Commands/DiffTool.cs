@@ -12,26 +12,31 @@ public static class Difftool
     {
         get
         {
-            var acdOption = new Option<string>(
-                aliases: ["--acd", "-a"],
-                description: "The path to the ACD file")
+            var command = new Command("difftool", "A command to show the diff of HEAD with the previous commit.");
+
+            var acdOption = new Option<string>("--acd", "-a")
             {
-                IsRequired = true
+                Description = "The path to the ACD file",
+                Required = true,
+                Validators = 
+                {
+                    optionValue => OptionValidator.FileExtension(optionValue, ".acd"),
+                    OptionValidator.FileExists,
+                }
             };
 
-            acdOption.AddValidator(result => OptionValidator.FileExtension(result, ".acd"));
-            acdOption.AddValidator(OptionValidator.FileExists);
+            command.Options.Add(acdOption);
 
-            var command = new Command("difftool", "A command to show the diff of HEAD with the previous commit.")
+            command.SetAction(parseResult => 
             {
-                acdOption,
-            };
+                var acdPath = parseResult.GetValue(acdOption) ?? throw new ArgumentNullException(nameof(acdOption));
 
-            command.SetHandler(Execute, acdOption);
+                Execute(acdPath);
+            });
+
             return command;
         }
     }
-
 
     private static void Execute(string acdPath)
     {

@@ -7,27 +7,27 @@ internal class Program
 {
     static async Task<int> Main(string[] args)
     {
-        var pauseOption = new Option<bool>(
-            aliases: new[] { "--pause", "-p" },
-            description: "Pause before exiting."
-        );
+        var pauseOption = new Option<bool>("--pause", "-p")
+        {
+            Description = "Pause before exiting."
+        };
 
         var rootCommand = new RootCommand("l5xgit - A tool to perform git-related operations on Logix Designer ACD files");
-        rootCommand.AddGlobalOption(pauseOption);
+        rootCommand.Options.Add(pauseOption);
 
-        rootCommand.AddCommand(Commit.Command);
-        rootCommand.AddCommand(RestoreAcd.Command);
-        rootCommand.AddCommand(Difftool.Command);
-        rootCommand.AddCommand(Explode.Command);
-        rootCommand.AddCommand(Implode.Command);
-        rootCommand.AddCommand(L5x2Acd.Command);
+        rootCommand.Subcommands.Add(Commit.Command);
+        rootCommand.Subcommands.Add(RestoreAcd.Command);
+        rootCommand.Subcommands.Add(Difftool.Command);
+        rootCommand.Subcommands.Add(Explode.Command);
+        rootCommand.Subcommands.Add(Implode.Command);
+        rootCommand.Subcommands.Add(L5x2Acd.Command);
 
-
-        var pause = rootCommand.Parse(args).GetValueForOption(pauseOption);
+        var parseResult = rootCommand.Parse(args);
+        var pause = parseResult.GetValue(pauseOption);
 
         try
         {
-            int result = await rootCommand.InvokeAsync(args);
+            int result = await parseResult.InvokeAsync();
 
             if (pause)
             {

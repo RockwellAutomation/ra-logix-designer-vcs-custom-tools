@@ -14,26 +14,31 @@ public static class Commit
     public static Command Command {
         get
         {
-            var acdOption = new Option<string>(
-                aliases: ["--acd", "-a"],
-                description: "The path to the ACD file")
+            var command = new Command("commit", "A command to Copy/Export/l5xplode/commit a representation of a Logix Designer ACD file.");
+
+            var acdOption = new Option<string>("--acd", "-a")
             {
-                IsRequired = true
+                Description = "The path to the ACD file",
+                Required = true,
+                Validators = 
+                {
+                    optionValue => OptionValidator.FileExtension(optionValue, ".acd"),
+                    OptionValidator.FileExists,
+                }
             };
 
-            acdOption.AddValidator(result => OptionValidator.FileExtension(result, ".acd"));
-            acdOption.AddValidator(OptionValidator.FileExists);
+            command.Options.Add(acdOption);
 
-            var command = new Command("commit", "A command to Copy/Export/l5xplode/commit a representation of a Logix Designer ACD file.")
+            command.SetAction(parseResult => 
             {
-                acdOption,
-            };
+                var acdPath = parseResult.GetValue(acdOption) ?? throw new ArgumentNullException(nameof(acdOption));
 
-            command.SetHandler(Execute, acdOption);
+                return Execute(acdPath);
+            });
+
             return command;
         }
     }
-
 
     private static async Task Execute(string acdPath)
     {

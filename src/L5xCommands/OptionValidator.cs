@@ -10,7 +10,7 @@ internal static class OptionValidator
         var value = result.GetValueOrDefault<string>();
         if (!string.IsNullOrEmpty(value) && !value.EndsWith(requiredExtension, StringComparison.OrdinalIgnoreCase))
         {
-            result.ErrorMessage = $"Option \"--{result.Symbol.Name}\" must end with {requiredExtension}";
+            result.AddError($"Option \"--{result.Option.Name}\" must end with {requiredExtension}");
         }
     }
 
@@ -19,7 +19,7 @@ internal static class OptionValidator
         var value = result.GetValueOrDefault<string>();
         if (!string.IsNullOrEmpty(value) && !File.Exists(value))
         {
-            result.ErrorMessage = $"Option \"--{result.Symbol.Name}\" must be a file which exists.";
+            result.AddError($"Option \"--{result.Option.Name}\" must be a file which exists.");
         }
     }
 }

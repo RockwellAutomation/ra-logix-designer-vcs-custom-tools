@@ -10,50 +10,61 @@ public static class Explode
     public static Command Command {
         get
         {
-            var l5xOption = new Option<string>(
-                aliases: ["--l5x", "-l"],
-                description: "The L5X file to expand into multiple XML files")
+            var command = new Command("explode", "Expand an L5X file into a multi-file XML representation");
+
+            var l5xOption = new Option<string>("--l5x", "-l")
             {
-                IsRequired = true 
+                Description = "The L5X file to expand into multiple XML files",
+                Required = true,
+                Validators = 
+                {
+                    optionValue => OptionValidator.FileExtension(optionValue, ".l5x"),
+                    OptionValidator.FileExists,
+                }
             };
 
-            var dirOption = new Option<string>(
-                aliases: ["--dir", "-d"],
-                description: "The directory to write the resultant XML files and folder structure to")
+            var dirOption = new Option<string>("--dir", "-d")
             {
-                IsRequired = true
+                Description = "The directory to write the resultant XML files and folder structure to",
+                Required = true
             };
 
-            var forceOption = new Option<bool>(
-                aliases: ["--force", "-f"],
-                description: "Force overwrite of existing files without prompting");
-
-            var prettyAttributesOption = new Option<bool>(
-                aliases: ["--pretty-attributes", "-p"],
-                description: "Format XML attributes by placing each attribute on a separate line for readability");
-
-            l5xOption.AddValidator(result => OptionValidator.FileExtension(result, ".l5x"));
-            l5xOption.AddValidator(OptionValidator.FileExists);
-
-            var command = new Command("explode", "Expand an L5X file into a multi-file XML representation")
+            var forceOption = new Option<bool>("--force", "-f")
             {
-                l5xOption,
-                dirOption,
-                forceOption,
-                prettyAttributesOption
+                Description = "Force overwrite of existing files without prompting"
             };
 
-            var formatOption = new Option<L5xSerializationFormat>(
-                aliases: ["--format"],
-                description: $"The serialization format to use.",
-                getDefaultValue: () => L5xSerializationFormat.Xml);
+            var prettyAttributesOption = new Option<bool>("--pretty-attributes", "-p")
+            {
+                Description = "Format XML attributes by placing each attribute on a separate line for readability"
+            };
 
+            var formatOption = new Option<L5xSerializationFormat>("--format")
+            {
+                Description = $"The serialization format to use.",
+                DefaultValueFactory = _ => L5xSerializationFormat.Xml
+            };
+
+            command.Options.Add(l5xOption);
+            command.Options.Add(dirOption);
+            command.Options.Add(forceOption);
+            command.Options.Add(prettyAttributesOption);
+            
             if (Enum.GetNames(typeof(L5xSerializationFormat)).Length > 1)
             {
-                command.AddOption(formatOption);
+                command.Options.Add(formatOption);
             }
 
-            command.SetHandler(Execute, l5xOption, dirOption, forceOption, prettyAttributesOption, formatOption);
+            command.SetAction(parseResult => 
+            {
+                var l5xPath = parseResult.GetValue(l5xOption) ?? throw new ArgumentNullException(nameof(l5xOption));
+                var dirPath = parseResult.GetValue(dirOption) ?? throw new ArgumentNullException(nameof(dirOption));
+                var force = parseResult.GetValue(forceOption);
+                var prettyAttributes = parseResult.GetValue(prettyAttributesOption);
+                var format = parseResult.GetValue(formatOption);
+
+                Execute(l5xPath, dirPath, force, prettyAttributes, format);
+            });
 
             return command;
         }

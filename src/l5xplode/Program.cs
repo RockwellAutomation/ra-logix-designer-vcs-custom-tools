@@ -10,12 +10,13 @@ class Program
     {
         var rootCommand = new RootCommand("l5xplode - A tool to transform L5X files into an organized XML file structure and back");
 
-        rootCommand.AddCommand(Explode.Command);
-        rootCommand.AddCommand(Implode.Command);
+        rootCommand.Subcommands.Add(Explode.Command);
+        rootCommand.Subcommands.Add(Implode.Command);
 
         try
         {
-            await rootCommand.InvokeAsync(args);
+            var parseResult = rootCommand.Parse(args);
+            await parseResult.InvokeAsync();
             return 0;
         }
         catch (Exception ex)

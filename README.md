@@ -81,7 +81,7 @@ l5xgit -h
 Some level of integration with Logix Designer can be achieved by using Custom Tools xml which is produced during the build
 configured to point to the build output path.
 
-`artifacts\bin\L5xCommands\release\Assets\CustomToolsMenu.xml` can be coped to: `C:\Program Files (x86)\Rockwell Software\RSLogix 5000\Common\CustomToolsMenu.xml`
+`artifacts\bin\l5xgit\release\Assets\CustomToolsMenu.xml` can be coped to: `C:\Program Files (x86)\Rockwell Software\RSLogix 5000\Common\CustomToolsMenu.xml`
 to install the custom tools globally within Logix Designer.
 
 

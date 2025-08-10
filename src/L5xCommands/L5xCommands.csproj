@@ -15,33 +15,4 @@
     <ProjectReference Include="..\L5xGitLib\L5xGitLib.csproj" />
     <ProjectReference Include="..\L5xploderLib\L5xploderLib.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Assets\commit.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Assets\difftool.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Assets\pull.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <Target Name="TransformCustomToolsMenu" AfterTargets="Build">
-    <PropertyGroup>
-      <_ActualOutDir>$([System.IO.Path]::GetFullPath('$(OutDir)'))</_ActualOutDir>
-      <_SourceFile>$(ProjectDir)Assets\CustomToolsMenu.xml</_SourceFile>
-      <_DestDir>$(_ActualOutDir)Assets\</_DestDir>
-      <_DestFile>$(_DestDir)CustomToolsMenu.xml</_DestFile>
-    </PropertyGroup>
-    <MakeDir Directories="$(_DestDir)" Condition="!Exists('$(_DestDir)')" />
-    <ReadLinesFromFile File="$(_SourceFile)">
-      <Output TaskParameter="Lines" ItemName="CustomToolsMenuLines"/>
-    </ReadLinesFromFile>
-    <WriteLinesToFile
-      File="$(_DestFile)"
-      Lines="@(CustomToolsMenuLines->Replace('@@OUTDIR@@', '$(_ActualOutDir)'))"
-      Overwrite="true" />
-  </Target>
 </Project>

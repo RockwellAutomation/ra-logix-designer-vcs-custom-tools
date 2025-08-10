@@ -6,6 +6,8 @@
     <PropertyGroup Label="Paths">
         <RepoRoot>$(MSBuildThisFileDirectory)../</RepoRoot>
         <ArtifactsPath>$(RepoRoot)artifacts</ArtifactsPath>
+        <OutputPath>$(ArtifactsPath)\bin\$(Configuration)\</OutputPath>
+        <OutDir>$(OutputPath)</OutDir>
     </PropertyGroup>
 
     <PropertyGroup Label="CompilerOptions">

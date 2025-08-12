@@ -25,28 +25,23 @@ internal class Program
         var parseResult = rootCommand.Parse(args);
         var pause = parseResult.GetValue(pauseOption);
 
+        int result;
         try
         {
-            int result = await parseResult.InvokeAsync();
-
-            if (pause)
-            {
-                Console.WriteLine("Press any key to exit...");
-                Console.ReadKey();
-            }
-
-            return result;
+            result = await parseResult.InvokeAsync();
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
-            if (pause)
-            {
-                Console.WriteLine("Press any key to exit...");
-                Console.ReadKey();
-            }
-
-            return -1;
+            result = -1;
         }
+
+        if (pause)
+        {
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
+        }
+
+        return result;
     }
 }

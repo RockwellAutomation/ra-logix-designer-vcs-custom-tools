@@ -10,7 +10,7 @@ public static class Acd2L5x
     {
         get
         {
-            var command = new Command("l5x2acd", "Converts a given ACD to an L5X file.");
+            var command = new Command("acd2l5x", "Converts a given ACD to an L5X file.");
 
             var acdOption = new Option<string>("--acd", "-a")
             {
@@ -55,7 +55,7 @@ public static class Acd2L5x
         var acdFullPath = Path.GetFullPath(acdPath);
         var l5xFullPath = Path.GetFullPath(l5xPath);
 
-        await Convert(l5xFullPath, acdFullPath);
+        await Convert(acdFullPath, l5xFullPath);
     }
 
     static async Task Convert(string acdFilePath, string l5xFilePath)

@@ -14,6 +14,7 @@ internal class Program
 
         var rootCommand = new RootCommand("l5xgit - A tool to perform git-related operations on Logix Designer ACD files");
         new List<Command> {
+            Acd2L5x.Command,
             Commit.Command,
             RestoreAcd.Command,
             Difftool.Command,

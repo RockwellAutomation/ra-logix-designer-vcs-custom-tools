@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35506.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "l5xplode", "l5xplode\l5xplode.csproj", "{61EDE216-D617-4C2C-8EFA-3CAD2C7FF4A8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "l5xplode", "src\l5xplode\l5xplode.csproj", "{61EDE216-D617-4C2C-8EFA-3CAD2C7FF4A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L5xploderLib", "L5xploderLib\L5xploderLib.csproj", "{204DFA3E-69F2-43C4-A9FC-50B9C29F4442}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L5xploderLib", "src\L5xploderLib\L5xploderLib.csproj", "{204DFA3E-69F2-43C4-A9FC-50B9C29F4442}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "l5xgit", "l5xgit\l5xgit.csproj", "{442FF80D-9FB9-4263-865A-5C0F4E394CD9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "l5xgit", "src\l5xgit\l5xgit.csproj", "{442FF80D-9FB9-4263-865A-5C0F4E394CD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L5xCommands", "L5xCommands\L5xCommands.csproj", "{79EB61CE-93EB-4C58-B75A-A24F79DEE59D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L5xCommands", "src\L5xCommands\L5xCommands.csproj", "{79EB61CE-93EB-4C58-B75A-A24F79DEE59D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L5xGitLib", "L5xGitLib\L5xGitLib.csproj", "{3941BF0E-9A3D-4DBB-8C7E-BDFD205BD774}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L5xGitLib", "src\L5xGitLib\L5xGitLib.csproj", "{3941BF0E-9A3D-4DBB-8C7E-BDFD205BD774}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

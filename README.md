@@ -31,7 +31,7 @@ Clone the repository and build:
 ```sh
 git clone <your-repo-url>
 cd <clone_dir>
-dotnet build ./src -c Release
+dotnet build -c Release
 ```
 
 ### Usage

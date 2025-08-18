@@ -4,7 +4,7 @@
     </PropertyGroup>
 
     <PropertyGroup Label="Paths">
-        <RepoRoot>$(MSBuildThisFileDirectory)../</RepoRoot>
+        <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
         <ArtifactsPath>$(RepoRoot)artifacts</ArtifactsPath>
         <OutputPath>$(ArtifactsPath)\bin\$(Configuration)\</OutputPath>
         <OutDir>$(OutputPath)</OutDir>

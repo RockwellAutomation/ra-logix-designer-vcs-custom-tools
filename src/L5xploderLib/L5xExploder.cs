@@ -3,6 +3,7 @@ using System.Xml.XPath;
 using L5xploderLib.Interfaces;
 using L5xploderLib.Models;
 using L5xploderLib.Services;
+using L5xploderLib.Transformation;
 
 namespace L5xploderLib;
 
@@ -11,7 +12,7 @@ public static class L5xExploder
     public static void Explode(
         Stream xmlStream,
         IEnumerable<L5xExploderConfig> configs,
-        IPersistenceService persistenceHandler)
+        IPersistenceService persistenceService)
     {
         var xmlDoc = XDocument.Load(xmlStream);
         var filePathRegistry = new FilePathRegistry();
@@ -21,17 +22,19 @@ public static class L5xExploder
             throw new InvalidDataException($"The XML document does not have a <{Constants.RootElementName}> root element.");
         }
 
-        if (persistenceHandler.SerializationOptions.OmitExportDate)
-        {
-            rootElement.Attribute("ExportDate")?.Remove();
-            rootElement.XPathSelectElements("Controller")?.Attributes("LastModifiedDate")?.Remove();
-        }
+        new RootElementTransformer()
+            .Transform(rootElement, persistenceService.SerializationOptions);
 
-        var elementFiles = ProcessConfigs(rootElement!, string.Empty, configs, filePathRegistry);
-        persistenceHandler.Save(xmlDoc, elementFiles);
+        var elementFiles = ProcessConfigs(rootElement!, string.Empty, configs, filePathRegistry, persistenceService);
+        persistenceService.Save(xmlDoc, elementFiles);
     }
 
-    private static IEnumerable<ElementFile> ProcessConfigs(XElement parentElement, string relativeOutputDir, IEnumerable<L5xExploderConfig> configs, FilePathRegistry filePathRegistry)
+    private static IEnumerable<ElementFile> ProcessConfigs(
+        XElement parentElement,
+        string relativeOutputDir,
+        IEnumerable<L5xExploderConfig> configs,
+        FilePathRegistry filePathRegistry,
+        IPersistenceService persistenceService)
     {
         var results = new List<ElementFile>();
 
@@ -42,7 +45,7 @@ public static class L5xExploder
 
             foreach (var element in matchingElements)
             {
-                results.AddRange(ProcessElement(element, relativeOutputDir, config, filePathRegistry));
+                results.AddRange(ProcessElement(element, relativeOutputDir, config, filePathRegistry, persistenceService));
                 element.Remove();
             }
         }
@@ -50,7 +53,12 @@ public static class L5xExploder
         return results;
     }
 
-    private static IEnumerable<ElementFile> ProcessElement(XElement element, string relativeOutputDir, L5xExploderConfig config, FilePathRegistry filePathRegistry)
+    private static IEnumerable<ElementFile> ProcessElement(
+        XElement element,
+        string relativeOutputDir,
+        L5xExploderConfig config,
+        FilePathRegistry filePathRegistry,
+        IPersistenceService persistenceService)
     {
         var results = new List<ElementFile>();
         var hasChildConfig = config.ChildConfigs != null && config.ChildConfigs.Any();
@@ -64,9 +72,12 @@ public static class L5xExploder
         // Process child configurations if they exist
         if (hasChildConfig)
         {
-            var childResults = ProcessConfigs(element, elementFolder, config.ChildConfigs!, filePathRegistry);
+            var childResults = ProcessConfigs(element, elementFolder, config.ChildConfigs!, filePathRegistry, persistenceService);
             results.AddRange(childResults);
         }
+
+        // Run any transformations
+        config.Transformers?.ToList().ForEach(transformer => transformer.Transform(element, persistenceService.SerializationOptions));
 
         // Run any custom serializer(s)
         if (config.CustomSerializers != null)

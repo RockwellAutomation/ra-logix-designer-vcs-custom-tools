@@ -47,8 +47,8 @@ public static class Explode
 
             command.Options.Add(l5xOption);
             command.Options.Add(dirOption);
-            command.Options.Add(forceOption);
             command.Options.Add(prettyAttributesOption);
+            command.Options.Add(forceOption);
             
             if (Enum.GetNames(typeof(L5xSerializationFormat)).Length > 1)
             {

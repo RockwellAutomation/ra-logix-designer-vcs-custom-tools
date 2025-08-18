@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using L5xploderLib.Serialization;
+using L5xploderLib.Transformation;
 
 namespace L5xploderLib;
 
@@ -57,6 +57,9 @@ public static class L5xDefaultConfig
                     CustomSerializers = [
                         new StructuredTextSerializer(),
                     ],
+                    Transformers = [
+                        new LadderLogicLineNumberTransformer(),
+                    ],
                 },
 
             ],
@@ -93,6 +96,9 @@ public static class L5xDefaultConfig
                     BaseFileNameGenerator = DefaultNameGenerator,
                     CustomSerializers = [
                         new StructuredTextSerializer(),
+                    ],
+                    Transformers = [
+                        new LadderLogicLineNumberTransformer(),
                     ],
                 }
             ],

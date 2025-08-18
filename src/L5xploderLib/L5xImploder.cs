@@ -121,6 +121,15 @@ public static class L5xImploder
             }
         }
 
+        // Undo any transformations
+        config.Transformers?.ToList().ForEach(transformer =>
+        {
+            foreach (var element in elements)
+            {
+                transformer.UnTransform(element, persistenceService.SerializationOptions);
+            }
+        });
+
         return elements;
     }
 }

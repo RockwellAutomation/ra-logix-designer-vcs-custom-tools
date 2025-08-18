@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using L5xploderLib.Interfaces;
 
 namespace L5xploderLib;
 
@@ -30,6 +31,11 @@ public sealed class L5xExploderConfig
     /// A use case might be persisting Structured Text (ST) as standalone text files instead of CDATA embedded in XML.
     /// </summary>
     public IEnumerable<ICustomSerializer>? CustomSerializers { get; init; }
+
+    /// <summary>
+    /// Optional tranformation of element representation before persisting to disk
+    /// </summary>
+    public IEnumerable<IXElementTransformer>? Transformers { get; init; }
 
     /// <summary>
     /// Optional child configurations for further breaking apart of nested elements.

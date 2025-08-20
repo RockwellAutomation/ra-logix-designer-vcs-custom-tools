@@ -14,7 +14,7 @@ public static class Acd2L5x
 
             var acdOption = new Option<string>("--acd", "-a")
             {
-                Description = "Path to the ACD file to write.",
+                Description = "Path to the ACD file to read.",
                 Required = true,
                 Validators = 
                 {
@@ -25,7 +25,7 @@ public static class Acd2L5x
 
             var l5xOption = new Option<string>("--l5x", "-l")
             {
-                Description = "Path to the L5X file to read.",
+                Description = "Path to the L5X file to write.",
                 Required = true,
                 Validators = 
                 {

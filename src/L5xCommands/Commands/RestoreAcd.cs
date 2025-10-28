@@ -61,7 +61,7 @@ public static class RestoreAcd
         using var tempL5xFile = TempFile.FromTempFileWithNewExtension(tempAcdFile, ".L5X");
 
         logger?.Status(tempL5xFile.Path, $"Restoring L5x from {config.DestinationPath}...");
-        L5xImploder.Implode(
+        await L5xImploder.ImplodeAsync(
             outputFilePath: tempL5xFile.Path,
             configs: L5xDefaultConfig.DefaultConfig,
             persistenceService: PersistenceServiceFactory.Create(

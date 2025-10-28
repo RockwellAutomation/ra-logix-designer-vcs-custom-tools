@@ -43,14 +43,14 @@ public static class Implode
                 var dirPath = parseResult.GetValue(dirOption) ?? throw new ArgumentNullException(nameof(dirOption));
                 var force = parseResult.GetValue(forceOption);
 
-                Execute(l5xPath, dirPath, force);
+                return Execute(l5xPath, dirPath, force);
             });
 
             return command;
         }
     }
 
-    private static void Execute(string l5xFile, string directory, bool force)
+    private static async Task Execute(string l5xFile, string directory, bool force)
     {
         bool confirmed = UserPrompts.ConfirmL5xOverwrite(l5xFile, force);
         if (!confirmed)
@@ -63,7 +63,7 @@ public static class Implode
             explodedDir: directory,
             options: L5xSerializationOptions.LoadFromFile(Paths.GetOptionsFilePath(directory)) ?? L5xSerializationOptions.DefaultOptions);
 
-        L5xImploder.Implode(
+        await L5xImploder.ImplodeAsync(
             outputFilePath: l5xFile,
             configs: config,
             persistenceService: persistenceHandler);

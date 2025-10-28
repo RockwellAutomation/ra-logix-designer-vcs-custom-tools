@@ -202,6 +202,11 @@ internal abstract class PersistenceService : IPersistenceService
             .Where(file => !string.IsNullOrEmpty(file));
     }
 
+    public async Task WarmReadCacheAsync()
+    {
+        await Task.Run(() => WarmReadCache(ExplodedSubDir, "*", recursive: true));
+    }
+
     protected string GetAbsoluteFilePath(string relativeFilePathWithoutExtension)
     {
         return Path.Combine(ExplodedSubDir, relativeFilePathWithoutExtension + FileExtension);
@@ -232,6 +237,50 @@ internal abstract class PersistenceService : IPersistenceService
         if (duplicates.Any())
         {
             throw new InvalidDataException($"Duplicate file paths found: {string.Join(", ", duplicates)}");
+        }
+    }
+
+    private static void WarmReadCache(string directory, string searchPattern = "*", int bufferSize = 8192, bool recursive = true)
+    {
+        if (!Directory.Exists(directory))
+            return;
+
+        var searchOption = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+
+        try
+        {
+            var files = Directory.GetFiles(directory, searchPattern, searchOption);
+
+            Parallel.ForEach(files,
+                new ParallelOptions { MaxDegreeOfParallelism = Math.Min(Environment.ProcessorCount * 2, 96) },
+                file =>
+                {
+                    try
+                    {
+                        using var fs = new FileStream(
+                            file,
+                            FileMode.Open,
+                            FileAccess.Read,
+                            FileShare.Read,
+                            bufferSize: bufferSize,
+                            FileOptions.SequentialScan);
+
+                        var buffer = new byte[bufferSize];
+                        var bytesToRead = Math.Min(buffer.Length, (int)fs.Length);
+                        if (bytesToRead > 0)
+                        {
+                            fs.Read(buffer, 0, bytesToRead);
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore errors during cache warming - it's best effort
+                    }
+                });
+        }
+        catch
+        {
+            // Ignore errors during cache warming - it's best effort
         }
     }
 }

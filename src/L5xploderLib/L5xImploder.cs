@@ -6,7 +6,17 @@ namespace L5xploderLib;
 
 public static class L5xImploder
 {
-    public static void Implode(
+    public static async Task ImplodeAsync(
+        string outputFilePath,
+        IEnumerable<L5xExploderConfig> configs,
+        IPersistenceService persistenceService)
+    {
+        var cacheWarmingTask = persistenceService.WarmReadCacheAsync();
+        Implode(outputFilePath, configs, persistenceService);
+        await cacheWarmingTask;
+    }
+
+    private static void Implode(
         string outputFilePath,
         IEnumerable<L5xExploderConfig> configs,
         IPersistenceService persistenceService)

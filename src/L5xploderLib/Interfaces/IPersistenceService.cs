@@ -27,4 +27,6 @@ public interface IPersistenceService
     IEnumerable<string> GetDirectories(string relativeFolderPath);
 
     IEnumerable<string> GetBaseFiles(string relativeFolderPath);
+
+    Task WarmReadCacheAsync();
 }

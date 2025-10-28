@@ -56,14 +56,12 @@ public static class L5xImploder
         // defined before things which depend on them in the resultant XML file.
         if (config.SortFunction != null)
         {
-            elements = config.SortFunction(elements).ToList();
+            elements = config.SortFunction(elements);
         }
 
-        // Append the sorted elements to the appropriate parent node in the docuemnt we are reconstituting.
-        foreach (var element in elements)
-        {
-            parentNode.Add(element);
-        }
+
+        // Append the sorted elements to the appropriate parent node in the document we are reconstituting.
+        parentNode.Add(elements);
     }
 
     private static string GetParentXPath(L5xExploderConfig config)

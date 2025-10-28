@@ -6,6 +6,22 @@ namespace L5xCommands;
 
 internal static class UserPrompts
 {
+    public static bool ConfirmL5xOverwrite(string l5xFile, bool force)
+    {
+        if (!force && File.Exists(l5xFile))
+        {
+            Console.Write($"File '{l5xFile}' already exists. Overwrite? (y/n): ");
+            var response = Console.ReadLine()?.Trim().ToLower();
+            if (response != "y" && response != "yes")
+            {
+                Console.WriteLine("Operation canceled.");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static string GetCommitMessagePromptIfNeeded(L5xGitConfig config)
     {
         return config.PromptForCommitMessage

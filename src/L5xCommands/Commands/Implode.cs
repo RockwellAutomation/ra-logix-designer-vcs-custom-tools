@@ -52,7 +52,7 @@ public static class Implode
 
     private static void Execute(string l5xFile, string directory, bool force)
     {
-        bool confirmed = ConfirmL5xOverwrite(l5xFile, force);
+        bool confirmed = UserPrompts.ConfirmL5xOverwrite(l5xFile, force);
         if (!confirmed)
         {
             return;
@@ -69,21 +69,5 @@ public static class Implode
             persistenceService: persistenceHandler);
 
         Console.WriteLine($"Reassembled L5X file '{l5xFile}' from '{directory}'.");
-    }
-
-    private static bool ConfirmL5xOverwrite(string l5xFile, bool force)
-    {
-        if (!force && File.Exists(l5xFile))
-        {
-            Console.Write($"File '{l5xFile}' already exists. Overwrite? (y/n): ");
-            var response = Console.ReadLine()?.Trim().ToLower();
-            if (response != "y" && response != "yes")
-            {
-                Console.WriteLine("Operation canceled.");
-                return false;
-            }
-        }
-
-        return true;
     }
 }

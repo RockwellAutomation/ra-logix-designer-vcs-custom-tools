@@ -60,13 +60,15 @@ public static class RestoreAcd
         using var tempAcdFile = TempFile.FromSuggestedFileName(acdFileName);
         using var tempL5xFile = TempFile.FromTempFileWithNewExtension(tempAcdFile, ".L5X");
 
+        logger?.Status(tempL5xFile.Path, $"Restoring L5x from {config.DestinationPath}...");
         L5xImploder.Implode(
             outputFilePath: tempL5xFile.Path,
             configs: L5xDefaultConfig.DefaultConfig,
             persistenceService: PersistenceServiceFactory.Create(
                 explodedDir: config.DestinationPath,
                 options: L5xSerializationOptions.LoadFromFile(Paths.GetOptionsFilePath(config.DestinationPath)) ?? L5xSerializationOptions.DefaultOptions));
-        
+        logger?.Status(tempL5xFile.Path, "Restoration of L5x complete.");
+
         await ConvertL5xToAcd(tempL5xFile.Path, tempAcdFile.Path);
 
         // Backup the file, same as logix designer would

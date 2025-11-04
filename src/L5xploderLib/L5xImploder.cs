@@ -6,17 +6,7 @@ namespace L5xploderLib;
 
 public static class L5xImploder
 {
-    public static async Task ImplodeAsync(
-        string outputFilePath,
-        IEnumerable<L5xExploderConfig> configs,
-        IPersistenceService persistenceService)
-    {
-        var cacheWarmingTask = persistenceService.WarmReadCacheAsync();
-        Implode(outputFilePath, configs, persistenceService);
-        await cacheWarmingTask;
-    }
-
-    private static void Implode(
+    public static void Implode(
         string outputFilePath,
         IEnumerable<L5xExploderConfig> configs,
         IPersistenceService persistenceService)
@@ -71,7 +61,10 @@ public static class L5xImploder
 
 
         // Append the sorted elements to the appropriate parent node in the document we are reconstituting.
-        parentNode.Add(elements);
+        lock (parentNode)
+        {
+            parentNode.Add(elements);
+        }
     }
 
     private static string GetParentXPath(L5xExploderConfig config)
@@ -98,35 +91,51 @@ public static class L5xImploder
 
         if (hasChildConfig)
         {
-            // If a child configuration exists files are one level deeper in thier identically named subdirectories
+            // If a child configuration exists files are one level deeper in their identically named subdirectories
             var subdirectories = persistenceService.GetDirectories(folderPath);
-            foreach (var subdirectory in subdirectories)
-            {
-                var folderName = Path.GetFileName(subdirectory); // Get the base folder name
-                var elementFiles = persistenceService.GetBaseFiles(subdirectory);
-                foreach (var file in elementFiles)
+            var loadedElements = subdirectories
+                .AsParallel()
+                .WithDegreeOfParallelism(Math.Max(4, Math.Min(Environment.ProcessorCount, 96)))
+                .SelectMany(subdirectory =>
                 {
-                    // Process the file only if its basename matches the folder name (case-insensitive)
-                    if (string.Equals(file, folderName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        var relativeFilePath = Path.Combine(subdirectory, file);
-                        var element = persistenceService.LoadElement(relativeFilePath);
-                        ProcessConfigs(subdirectory, element, config.ChildConfigs!, persistenceService);
-                        elements.Add(element);
-                    }
-                }
-            }
+                    var folderName = Path.GetFileName(subdirectory);
+                    var elementFiles = persistenceService.GetBaseFiles(subdirectory);
+
+                    return elementFiles
+                        .Where(file => string.Equals(file, folderName, StringComparison.OrdinalIgnoreCase))
+                        .Select(file =>
+                        {
+                            var relativeFilePath = Path.Combine(subdirectory, file);
+                            var element = persistenceService.LoadElement(relativeFilePath);
+                            ProcessConfigs(subdirectory, element, config.ChildConfigs!, persistenceService);
+                            return (element, subdirectory);
+                        });
+                });
+            
+            // Maintain order by subdirectory name
+            elements.AddRange(loadedElements
+                .OrderBy(x => x.subdirectory, StringComparer.OrdinalIgnoreCase)
+                .Select(x => x.element));
         }
         else
         {
             // If no child configuration exists the element files are in the current folder
             var elementFiles = persistenceService.GetBaseFiles(folderPath);
-            foreach (var file in elementFiles)
-            {
-                var relativeFilePath = Path.Combine(folderPath, file);
-                var element = persistenceService.LoadElement(relativeFilePath);
-                elements.Add(element);
-            }
+
+            var loadedElements = elementFiles
+                .AsParallel()
+                .WithDegreeOfParallelism(Math.Max(4, Math.Min(Environment.ProcessorCount, 96)))
+                .Select(file =>
+                {
+                    var relativeFilePath = Path.Combine(folderPath, file);
+                    var element = persistenceService.LoadElement(relativeFilePath);
+                    return (element, file);
+                });
+            
+            // Maintain order by filename
+            elements.AddRange(loadedElements
+                .OrderBy(x => x.file, StringComparer.OrdinalIgnoreCase)
+                .Select(x => x.element));
         }
 
         // Undo any transformations

@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Diagnostics;
+using System.Xml.Linq;
 using L5xploderLib.Serialization;
 using L5xploderLib.Transformation;
 
@@ -169,18 +170,35 @@ public static class L5xDefaultConfig
                 dependencies[aoi] = new List<XElement>();
             }
 
-            // Find any required DataTypes for this AOI
-            var requiredDataTypes = aoi
-                .Element("LocalTags")?
-                .Elements("LocalTag")
-                .Select(tag => tag.Attribute("DataType")?.Value)
-                .Where(dataType => !string.IsNullOrEmpty(dataType));
+            var dependenciesList = Enumerable.Empty<string?>();
+            var hasExplicitDependenciesElement = aoi.Element("Dependencies") != null;
 
+            if (hasExplicitDependenciesElement) {
+                // If we have an explicit <Dependencies> element, use that to determine inter-aoi dependencies
+                dependenciesList = aoi
+                    .Element("Dependencies")?
+                    .Elements("Dependency")?
+                    .Where(dep => dep.Attribute("Type")?.Value == "AddOnInstructionDefinition")
+                    .Select(dep => dep.Attribute("Name")?.Value)
+                    .Where(name => !string.IsNullOrEmpty(name))
+                    ?? Enumerable.Empty<string?>();
+            } else {
+                // If no explicit dependencies, find any implicit dependencies between AOIs.
+                // This only takes into consideration unencoded LocalTags DataTypes that reference other AOIs, so is best-effort only
+                // for older revisions of Logix Designer which do not include an explicit <Dependencies> element.
+                dependenciesList = aoi
+                    .Element("LocalTags")?
+                    .Elements("LocalTag")
+                    .Select(tag => tag.Attribute("DataType")?.Value)
+                    .Where(dataType => !string.IsNullOrEmpty(dataType))
+                    .Where(dataType => aoiLookup.ContainsKey(dataType!))
+                    ?? Enumerable.Empty<string?>();
+            }
 
-            foreach (var dataType in requiredDataTypes ?? Enumerable.Empty<string>())
+            foreach (var dependencyName in dependenciesList)
             {
                 // If the required DataType is another AOI, it is a dependency
-                if (!string.IsNullOrEmpty(dataType) && aoiLookup.TryGetValue(dataType, out var requiredAoi) && requiredAoi != aoi)
+                if (!string.IsNullOrEmpty(dependencyName) && aoiLookup.TryGetValue(dependencyName, out var requiredAoi) && requiredAoi != aoi)
                 {
                     // And finally, add the dependency to the map
                     dependencies[aoi].Add(requiredAoi);
@@ -273,6 +291,6 @@ public static class L5xDefaultConfig
             Visit(node);
         }
 
-        return sorted.ToList();
+        return sorted;
     }
 }

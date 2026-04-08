@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="38.00" TargetName="DepTestProject" TargetType="Controller" ContainsContext="false" Owner="TestUser" ExportDate="Mon Apr 07 10:00:00 2025" ExportOptions="NoRawData L5KData DecoratedData Dependencies ForceProtectedEncoding AllProjDocTrans">
+  <Controller Use="Target" Name="DepTestProject" ProcessorType="1756-L85E" MajorRev="38" MinorRev="11" TimeSlice="20" ShareUnusedTimeSlice="1" ProjectCreationDate="Mon Jan 01 00:00:00 2024" LastModifiedDate="Mon Apr 07 10:00:00 2025" SFCExecutionControl="CurrentActive" SFCRestartPosition="MostRecent" SFCLastScan="DontScan" ProjectSN="16#0000_0000" MatchProjectToController="false" CanUseRPIFromProducer="false" InhibitAutomaticFirmwareUpdate="0" PassThroughConfiguration="EnabledWithAppend" DownloadProjectDocumentationAndExtendedProperties="true" DownloadProjectCustomProperties="true" ReportMinorOverflow="false">
+    <DataTypes>
+      <DataType Name="SimpleUDT" Family="NoFamily" Class="User">
+        <Members>
+          <Member Name="Value" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write" />
+          <Member Name="Status" DataType="BOOL" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write" />
+        </Members>
+      </DataType>
+    </DataTypes>
+    <Modules>
+      <Module Name="Local" CatalogNumber="1756-L85E" Vendor="1" ProductType="14" ProductCode="166" Major="36" Minor="11" ParentModule="Local" ParentModPortId="1" Inhibited="false" MajorFault="true">
+        <EKey State="Disabled" />
+        <Ports>
+          <Port Id="1" Address="0" Type="ICP" Upstream="false" />
+        </Ports>
+      </Module>
+    </Modules>
+    <AddOnInstructionDefinitions>
+      <!-- Deliberately reverse order: TopAOI first, ZBaseAOI last -->
+      <AddOnInstruction Name="TopAOI" Revision="1.0" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2024-01-01T00:00:00.000Z" CreatedBy="TestUser" EditedDate="2024-01-01T00:00:00.000Z" EditedBy="TestUser" SoftwareRevision="v38.00">
+        <Dependencies>
+          <Dependency Type="AddOnInstructionDefinition" Name="MiddleAOI" />
+        </Dependencies>
+        <Parameters>
+          <Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
+            <DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0" /></DefaultData>
+          </Parameter>
+          <Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
+            <DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0" /></DefaultData>
+          </Parameter>
+          <Parameter Name="MiddleInst" TagType="Base" DataType="MiddleAOI" Usage="InOut" Required="true" Visible="true" ExternalAccess="Read/Write" />
+        </Parameters>
+        <LocalTags />
+        <Routines>
+          <Routine Name="Logic" Type="RLL">
+            <RLLContent>
+              <Rung Number="0" Type="N">
+                <Text><![CDATA[NOP();]]></Text>
+              </Rung>
+            </RLLContent>
+          </Routine>
+        </Routines>
+      </AddOnInstruction>
+
+      <AddOnInstruction Name="IndependentAOI" Revision="1.0" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2024-01-01T00:00:00.000Z" CreatedBy="TestUser" EditedDate="2024-01-01T00:00:00.000Z" EditedBy="TestUser" SoftwareRevision="v38.00">
+        <Dependencies />
+        <Parameters>
+          <Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
+            <DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0" /></DefaultData>
+          </Parameter>
+          <Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
+            <DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0" /></DefaultData>
+          </Parameter>
+        </Parameters>
+        <LocalTags />
+        <Routines>
+          <Routine Name="Logic" Type="RLL">
+            <RLLContent>
+              <Rung Number="0" Type="N">
+                <Text><![CDATA[NOP();]]></Text>
+              </Rung>
+            </RLLContent>
+          </Routine>
+        </Routines>
+      </AddOnInstruction>
+
+      <AddOnInstruction Name="MiddleAOI" Revision="1.0" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2024-01-01T00:00:00.000Z" CreatedBy="TestUser" EditedDate="2024-01-01T00:00:00.000Z" EditedBy="TestUser" SoftwareRevision="v38.00">
+        <Dependencies>
+          <Dependency Type="AddOnInstructionDefinition" Name="ZBaseAOI" />
+        </Dependencies>
+        <Parameters>
+          <Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
+            <DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0" /></DefaultData>
+          </Parameter>
+          <Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
+            <DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0" /></DefaultData>
+          </Parameter>
+          <Parameter Name="BaseInst" TagType="Base" DataType="ZBaseAOI" Usage="InOut" Required="true" Visible="true" ExternalAccess="Read/Write" />
+        </Parameters>
+        <LocalTags />
+        <Routines>
+          <Routine Name="Logic" Type="RLL">
+            <RLLContent>
+              <Rung Number="0" Type="N">
+                <Text><![CDATA[NOP();]]></Text>
+              </Rung>
+            </RLLContent>
+          </Routine>
+        </Routines>
+      </AddOnInstruction>
+
+      <AddOnInstruction Name="ZBaseAOI" Revision="1.0" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2024-01-01T00:00:00.000Z" CreatedBy="TestUser" EditedDate="2024-01-01T00:00:00.000Z" EditedBy="TestUser" SoftwareRevision="v38.00">
+        <Dependencies />
+        <Parameters>
+          <Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
+            <DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0" /></DefaultData>
+          </Parameter>
+          <Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
+            <DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0" /></DefaultData>
+          </Parameter>
+          <Parameter Name="InputVal" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read Only">
+            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
+            <DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0" /></DefaultData>
+          </Parameter>
+        </Parameters>
+        <LocalTags />
+        <Routines>
+          <Routine Name="Logic" Type="RLL">
+            <RLLContent>
+              <Rung Number="0" Type="N">
+                <Text><![CDATA[NOP();]]></Text>
+              </Rung>
+            </RLLContent>
+          </Routine>
+        </Routines>
+      </AddOnInstruction>
+    </AddOnInstructionDefinitions>
+    <Tags>
+      <Tag Name="TopTag" TagType="Base" DataType="DINT" Radix="Decimal" Constant="false" ExternalAccess="Read/Write">
+        <Data Format="L5K"><![CDATA[0]]></Data>
+        <Data Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0" /></Data>
+      </Tag>
+    </Tags>
+    <Programs>
+      <Program Name="MainProgram" TestEdits="false" MainRoutineName="MainRoutine" Disabled="false" UseAsFolder="false">
+        <Tags />
+        <Routines>
+          <Routine Name="MainRoutine" Type="RLL">
+            <RLLContent>
+              <Rung Number="0" Type="N">
+                <Text><![CDATA[NOP();]]></Text>
+              </Rung>
+            </RLLContent>
+          </Routine>
+        </Routines>
+      </Program>
+    </Programs>
+    <Tasks>
+      <Task Name="MainTask" Type="CONTINUOUS" Rate="10" Priority="10" Watchdog="500" DisableUpdateOutputs="false" InhibitTask="false">
+        <ScheduledPrograms>
+          <ScheduledProgram Name="MainProgram" />
+        </ScheduledPrograms>
+      </Task>
+    </Tasks>
+    <Trends />
+    <DataLogs />
+  </Controller>
+</RSLogix5000Content>

@@ -27,6 +27,14 @@ public sealed class L5xExploderConfig
     public Func<IEnumerable<XElement>, IList<XElement>>? SortFunction { get; init; }
 
     /// <summary>
+    /// Optional action to run on the full collection of matched elements before they are
+    /// individually processed and persisted. Useful for injecting ordering hints or other
+    /// info that depends on the element's position relative to its siblings.
+    /// Receives the element list and the current serialization options.
+    /// </summary>
+    public Action<IList<XElement>, L5xSerializationOptions>? PreExplodeTransform { get; init; }
+
+    /// <summary>
     /// Optional static serializer for persisting child elements in a format other than the selected default serialization format.
     /// A use case might be persisting Structured Text (ST) as standalone text files instead of CDATA embedded in XML.
     /// </summary>

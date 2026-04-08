@@ -10,26 +10,10 @@ public static class L5x2Acd
         {
             var command = new Command("l5x2acd", "Converts a given L5x to an ACD file.");
 
-            var acdOption = new Option<string>("--acd", "-a")
-            {
-                Description = "Path to the ACD file to write.",
-                Required = true,
-                Validators = 
-                {
-                    optionValue => OptionValidator.FileExtension(optionValue, ".acd"),
-                    OptionValidator.FileExists,
-                }
-            };
-
-            var l5xOption = new Option<string>("--l5x", "-l")
-            {
-                Description = "Path to the L5X file to read.",
-                Required = true,
-                Validators = 
-                {
-                    optionValue => OptionValidator.FileExtension(optionValue, ".l5x"),
-                }
-            };
+            var acdOption = CommandOptions.AcdOutputFile();
+            acdOption.Required = true;
+            var l5xOption = CommandOptions.L5xInputFile();
+            l5xOption.Required = true;
 
             command.Options.Add(acdOption);
             command.Options.Add(l5xOption);

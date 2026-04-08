@@ -24,6 +24,9 @@ internal sealed class LadderLogicLineNumberTransformer : IXElementTransformer
                 //
                 // The only reason it would matter is user preference.  The L5x importer does not care about
                 // attribute order.
+                //
+                // Actually, I'm not even certain if line numbers are read by the importer, but in the interest
+                // of preserving the original format, we will include them until we're certain.
 
                 var rung = rungs[i];
                 var existingAttrs = rung.Attributes().ToList();

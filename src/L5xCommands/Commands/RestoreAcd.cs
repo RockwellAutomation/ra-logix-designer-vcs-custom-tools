@@ -15,14 +15,7 @@ public static class RestoreAcd
         {
             var command = new Command("restoreacd", "The inverse of the commit command, this command will overwrite the chosen ACD file with one imploded from Git.");
 
-            var acdOption = new Option<string?>("--acd", "-a")
-            {
-                Description = "Path to the ACD file to overwrite. If not provided will prompt for path.",
-                Validators = 
-                {
-                    optionValue => OptionValidator.FileExtension(optionValue, ".acd"),
-                }
-            };
+            var acdOption = CommandOptions.AcdOutputFile();
 
             command.Options.Add(acdOption);
 

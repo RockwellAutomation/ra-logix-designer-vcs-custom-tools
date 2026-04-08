@@ -15,31 +15,26 @@ public static class Commit
         {
             var command = new Command("commit", "A command to Copy/Export/l5xplode/commit a representation of a Logix Designer ACD file.");
 
-            var acdOption = new Option<string>("--acd", "-a")
-            {
-                Description = "The path to the ACD file",
-                Required = true,
-                Validators = 
-                {
-                    optionValue => OptionValidator.FileExtension(optionValue, ".acd"),
-                    OptionValidator.FileExists,
-                }
-            };
+            var acdOption = CommandOptions.AcdInputFile();
+            acdOption.Required = true;
+            var unsafeSkipDependencyCheckOption = CommandOptions.UnsafeSkipDependencyCheck();
 
             command.Options.Add(acdOption);
+            command.Options.Add(unsafeSkipDependencyCheckOption);
 
             command.SetAction(parseResult => 
             {
                 var acdPath = parseResult.GetValue(acdOption) ?? throw new ArgumentNullException(nameof(acdOption));
+                var unsafeSkipDependencyCheck = parseResult.GetValue(unsafeSkipDependencyCheckOption);
 
-                return Execute(acdPath);
+                return Execute(acdPath, unsafeSkipDependencyCheck);
             });
 
             return command;
         }
     }
 
-    private static async Task Execute(string acdPath)
+    private static async Task Execute(string acdPath, bool unsafeSkipDependencyCheck)
     {
         var logger = new StdOutEventLogger();
         var config = UserPrompts.InitializeConfigPromptIfNeeded(acdPath, logger);
@@ -51,11 +46,11 @@ public static class Commit
             action: async () =>
             {
                 var commitMessage = UserPrompts.GetCommitMessagePromptIfNeeded(config);
-                await CommitFromAcd(acdPath, config, commitMessage, logger);
+                await CommitFromAcd(acdPath, config, commitMessage, logger, unsafeSkipDependencyCheck);
             });
     }
 
-    private static async Task<bool> CommitFromAcd(string acdPath, L5xGitConfig config, string commitMessage, IOperationEvent? logger)
+    private static async Task<bool> CommitFromAcd(string acdPath, L5xGitConfig config, string commitMessage, IOperationEvent? logger, bool unsafeSkipDependencyCheck)
     {
         logger?.Status(config.DestinationPath, "Creating destination directory...");
         Directory.CreateDirectory(config.DestinationPath);
@@ -67,7 +62,7 @@ public static class Commit
         await LogixProjectConverter.ConvertAsync(tempAcdFile.Path, tempL5xFile.Path, logger: logger, overwrite: false);
 
         logger?.Status(tempL5xFile.Path, "l5xploding L5X...");
-        ExplodeL5x(tempL5xFile.Path, config.DestinationPath);
+        ExplodeL5x(tempL5xFile.Path, config.DestinationPath, unsafeSkipDependencyCheck);
 
         logger?.Status(config.DestinationPath, "Committing to Git repository...");
 
@@ -99,19 +94,34 @@ public static class Commit
         return true;
     }
 
-    static void ExplodeL5x(string l5xFilePath, string destinationPath)
+    static void ExplodeL5x(string l5xFilePath, string destinationPath, bool unsafeSkipDependencyCheck)
     {
         var defaultOptions = new L5xSerializationOptions()
         {
             PrettyXmlAttributes = false,
             Format = L5xSerializationFormat.Xml,
             OmitExportDate = true,
+            UnsafeSkipDependencyCheck = unsafeSkipDependencyCheck,
         };
+
+        var savedOptions = L5xSerializationOptions.LoadFromFile(Paths.GetOptionsFilePath(destinationPath));
+
+        // If we have previously saved options, inherit UnsafeSkipDependencyCheck from them unless
+        // the user is explicitly providing the flag now.
+        var options = savedOptions != null
+            ? new L5xSerializationOptions
+            {
+                PrettyXmlAttributes = savedOptions.PrettyXmlAttributes,
+                Format = savedOptions.Format,
+                OmitExportDate = savedOptions.OmitExportDate,
+                UnsafeSkipDependencyCheck = unsafeSkipDependencyCheck || savedOptions.UnsafeSkipDependencyCheck,
+            }
+            : defaultOptions;
 
         var config = L5xDefaultConfig.DefaultConfig;
         var persistenceHandler = PersistenceServiceFactory.Create(
             explodedDir: destinationPath,
-            options: L5xSerializationOptions.LoadFromFile(Paths.GetOptionsFilePath(destinationPath)) ?? defaultOptions);
+            options: options);
 
         using var inputStream = new FileStream(l5xFilePath, FileMode.Open, FileAccess.Read);
         L5xExploder.Explode(inputStream, config, persistenceHandler);

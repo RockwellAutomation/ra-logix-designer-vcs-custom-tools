@@ -12,26 +12,11 @@ public static class Implode
         {
             var command = new Command("implode", "Reconstitute an equivalent L5X file from the output of the explode command");
 
-            var dirOption = new Option<string>("--dir", "-d")
-            {
-                Description = "The directory containing the XML files to reconstitute the L5X file",
-                Required = true
-            };
-
-            var l5xOption = new Option<string>("--l5x", "-l")
-            {
-                Description = "The output L5X file path",
-                Required = true,
-                Validators = 
-                {
-                    optionValue => OptionValidator.FileExtension(optionValue, ".l5x"),
-                }
-            };
-
-            var forceOption = new Option<bool>("--force", "-f")
-            {
-                Description = "Force overwrite of existing files without prompting"
-            };
+            var dirOption = CommandOptions.Directory();
+            dirOption.Required = true;
+            var l5xOption = CommandOptions.L5xOutputFile();
+            l5xOption.Required = true;
+            var forceOption = CommandOptions.Force();
 
             command.Options.Add(dirOption);
             command.Options.Add(l5xOption);
@@ -43,8 +28,16 @@ public static class Implode
                 var dirPath = parseResult.GetValue(dirOption) ?? throw new ArgumentNullException(nameof(dirOption));
                 var force = parseResult.GetValue(forceOption);
 
-                Execute(l5xPath, dirPath, force);
-                return;
+                try
+                {
+                    Execute(l5xPath, dirPath, force);
+                    return 0;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error: {ex.Message}");
+                    return 1;
+                }
             });
 
             return command;

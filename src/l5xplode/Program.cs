@@ -13,16 +13,18 @@ class Program
         rootCommand.Subcommands.Add(Explode.Command);
         rootCommand.Subcommands.Add(Implode.Command);
 
+        int result;
         try
         {
             var parseResult = rootCommand.Parse(args);
-            await parseResult.InvokeAsync();
-            return 0;
+            result = await parseResult.InvokeAsync();
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
-            return -1;
+            result = 1;
         }
+
+        return result;
     }
 }

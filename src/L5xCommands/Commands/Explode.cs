@@ -12,43 +12,20 @@ public static class Explode
         {
             var command = new Command("explode", "Expand an L5X file into a multi-file XML representation");
 
-            var l5xOption = new Option<string>("--l5x", "-l")
-            {
-                Description = "The L5X file to expand into multiple XML files",
-                Required = true,
-                Validators = 
-                {
-                    optionValue => OptionValidator.FileExtension(optionValue, ".l5x"),
-                    OptionValidator.FileExists,
-                }
-            };
-
-            var dirOption = new Option<string>("--dir", "-d")
-            {
-                Description = "The directory to write the resultant XML files and folder structure to",
-                Required = true
-            };
-
-            var forceOption = new Option<bool>("--force", "-f")
-            {
-                Description = "Force overwrite of existing files without prompting"
-            };
-
-            var prettyAttributesOption = new Option<bool>("--pretty-attributes", "-p")
-            {
-                Description = "Format XML attributes by placing each attribute on a separate line for readability"
-            };
-
-            var formatOption = new Option<L5xSerializationFormat>("--format")
-            {
-                Description = $"The serialization format to use.",
-                DefaultValueFactory = _ => L5xSerializationFormat.Xml
-            };
+            var l5xOption = CommandOptions.L5xInputFile();
+            l5xOption.Required = true;
+            var dirOption = CommandOptions.Directory();
+            dirOption.Required = true;
+            var forceOption = CommandOptions.Force();
+            var prettyAttributesOption = CommandOptions.PrettyAttributes();
+            var formatOption = CommandOptions.Format();
+            var unsafeSkipDependencyCheckOption = CommandOptions.UnsafeSkipDependencyCheck();
 
             command.Options.Add(l5xOption);
             command.Options.Add(dirOption);
             command.Options.Add(prettyAttributesOption);
             command.Options.Add(forceOption);
+            command.Options.Add(unsafeSkipDependencyCheckOption);
             
             if (Enum.GetNames(typeof(L5xSerializationFormat)).Length > 1)
             {
@@ -62,15 +39,25 @@ public static class Explode
                 var force = parseResult.GetValue(forceOption);
                 var prettyAttributes = parseResult.GetValue(prettyAttributesOption);
                 var format = parseResult.GetValue(formatOption);
+                var unsafeSkipDependencyCheck = parseResult.GetValue(unsafeSkipDependencyCheckOption);
 
-                Execute(l5xPath, dirPath, force, prettyAttributes, format);
+                try
+                {
+                    Execute(l5xPath, dirPath, force, prettyAttributes, format, unsafeSkipDependencyCheck);
+                    return 0;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error: {ex.Message}");
+                    return 1;
+                }
             });
 
             return command;
         }
     }
 
-    private static void Execute(string l5xFile, string directory, bool force, bool prettyAttributes, L5xSerializationFormat format)
+    private static void Execute(string l5xFile, string directory, bool force, bool prettyAttributes, L5xSerializationFormat format, bool unsafeSkipDependencyCheck)
     {
         bool confirmed = force || UserPrompts.PromptForDirectoryOverwriteIfExists(Paths.GetExplodedSubDir(directory));
         if (!confirmed)
@@ -88,6 +75,7 @@ public static class Explode
                 Format = format,
                 PrettyXmlAttributes = prettyAttributes,
                 OmitExportDate = true,
+                UnsafeSkipDependencyCheck = unsafeSkipDependencyCheck,
             });
 
         using var inputStream = new FileStream(l5xFile, FileMode.Open, FileAccess.Read);

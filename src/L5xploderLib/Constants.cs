@@ -10,4 +10,5 @@ internal static class Constants
     public const string YamlFileExtension = ".yaml";
     public const string JsonFileExtension = ".json";
     public const string StructuredTextFileExtension = ".st";
+    public const string OriginalOrderingHintElement = "L5XGitPrevAOI";
 }

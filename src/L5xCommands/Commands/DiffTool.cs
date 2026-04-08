@@ -14,16 +14,8 @@ public static class Difftool
         {
             var command = new Command("difftool", "A command to show the diff of HEAD with the previous commit.");
 
-            var acdOption = new Option<string>("--acd", "-a")
-            {
-                Description = "The path to the ACD file",
-                Required = true,
-                Validators = 
-                {
-                    optionValue => OptionValidator.FileExtension(optionValue, ".acd"),
-                    OptionValidator.FileExists,
-                }
-            };
+            var acdOption = CommandOptions.AcdInputFile();
+            acdOption.Required = true;
 
             command.Options.Add(acdOption);
 
@@ -31,7 +23,16 @@ public static class Difftool
             {
                 var acdPath = parseResult.GetValue(acdOption) ?? throw new ArgumentNullException(nameof(acdOption));
 
-                Execute(acdPath);
+                try
+                {
+                    Execute(acdPath);
+                    return 0;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error: {ex.Message}");
+                    return 1;
+                }
             });
 
             return command;

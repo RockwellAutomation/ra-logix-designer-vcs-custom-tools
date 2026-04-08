@@ -44,6 +44,7 @@ public static class Implode
                 var force = parseResult.GetValue(forceOption);
 
                 Execute(l5xPath, dirPath, force);
+                return;
             });
 
             return command;

@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta6.25358.103" />
+    <PackageReference Include="System.CommandLine" Version="2.0.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,11 +36,8 @@
     </PropertyGroup>
     <MakeDir Directories="$(_DestDir)" Condition="!Exists('$(_DestDir)')" />
     <ReadLinesFromFile File="$(_SourceFile)">
-      <Output TaskParameter="Lines" ItemName="CustomToolsMenuLines"/>
+      <Output TaskParameter="Lines" ItemName="CustomToolsMenuLines" />
     </ReadLinesFromFile>
-    <WriteLinesToFile
-      File="$(_DestFile)"
-      Lines="@(CustomToolsMenuLines->Replace('@@OUTDIR@@', '$(_ActualOutDir)'))"
-      Overwrite="true" />
+    <WriteLinesToFile File="$(_DestFile)" Lines="@(CustomToolsMenuLines-&gt;Replace('@@OUTDIR@@', '$(_ActualOutDir)'))" Overwrite="true" />
   </Target>
 </Project>

@@ -269,7 +269,7 @@ internal abstract class PersistenceService : IPersistenceService
                         var bytesToRead = Math.Min(buffer.Length, (int)fs.Length);
                         if (bytesToRead > 0)
                         {
-                            fs.Read(buffer, 0, bytesToRead);
+                            var numBytesRead = fs.Read(buffer, 0, bytesToRead);
                         }
                     }
                     catch

@@ -1,6 +1,6 @@
 # ra-logix-designer-vcs-custom-tools
 
-A collection of .NET 8.0 command-line utilities and libraries for working with Rockwell Automation Studio 
+A collection of .NET 10.0 command-line utilities and libraries for working with Rockwell Automation Studio 
 5000 `.L5X` project files.
 
 The `l5xplode` command enables you to "explode" (decompose) `.L5X` files into a structured directory of XML and text files, 
@@ -17,11 +17,11 @@ files to/from a more git-appropriate format, and even commit / diff those change
 - **Convert** between `.L5X` and `.ACD` (binary project) formats (requires Studio 5000 Logix Designer and SDK libraries).
 - **Git integration**: Commit, diff, and restore project files using Git-friendly workflows.
 - **Custom serialization**: Allows for adding custom serialization formats and options.
-- **Cross-platform**: Runs on Windows and Linux (limited features) with .NET 8.0.
+- **Cross-platform**: Runs on Windows and Linux (limited features) with .NET 10.0.
 
 ### Prerequisites
 
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - Studio 5000 Logix Designer and the Logix Designer SDK for `.ACD` file operations
 
 ### Build

@@ -1,5 +1,3 @@
-using RockwellAutomation.LogixDesigner;
-using RockwellAutomation.LogixDesigner.Logging;
 using System.CommandLine;
 
 namespace L5xCommands.Commands;
@@ -50,25 +48,9 @@ public static class Acd2L5x
 
     private static async Task Execute(string acdPath, string l5xPath)
     {
-        var logger = new StdOutEventLogger();
-
         var acdFullPath = Path.GetFullPath(acdPath);
         var l5xFullPath = Path.GetFullPath(l5xPath);
 
-        await Convert(acdFullPath, l5xFullPath);
-    }
-
-    static async Task Convert(string acdFilePath, string l5xFilePath)
-    {
-        Console.WriteLine($"Converting ACD file '{acdFilePath}' to L5X file '{l5xFilePath}'...");
-        
-        using LogixProject project = await LogixProject.OpenLogixProjectAsync(acdFilePath, new StdOutEventLogger());
-        await project.SaveAsAsync(l5xFilePath, true);
-
-        var fileBytes = new FileInfo(l5xFilePath).Length;
-        if (fileBytes == 0)
-        {
-            throw new OperationFailedException("Unable to save project: An unknown error has occured", l5xFilePath);
-        }
+        await LogixProjectConverter.ConvertAsync(acdFullPath, l5xFullPath);
     }
 }

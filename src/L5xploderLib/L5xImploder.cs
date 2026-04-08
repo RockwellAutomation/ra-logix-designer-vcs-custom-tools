@@ -17,6 +17,7 @@ public static class L5xImploder
 
         ProcessConfigs(string.Empty, rootElement!, configs, persistenceService);
 
+        FileHelpers.EnsureDirectoryExists(outputFilePath);
         xmlDoc.Save(outputFilePath);
     }
 

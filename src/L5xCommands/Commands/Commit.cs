@@ -3,7 +3,6 @@ using L5xGitLib.Services;
 using L5xploderLib;
 using L5xploderLib.Enum;
 using L5xploderLib.Services;
-using RockwellAutomation.LogixDesigner;
 using RockwellAutomation.LogixDesigner.Logging;
 using System.CommandLine;
 
@@ -56,7 +55,7 @@ public static class Commit
             });
     }
 
-    private static async Task<bool> CommitFromAcd(string acdPath, L5xGitConfig config, string commitMessage, StdOutEventLogger? logger)
+    private static async Task<bool> CommitFromAcd(string acdPath, L5xGitConfig config, string commitMessage, IOperationEvent? logger)
     {
         logger?.Status(config.DestinationPath, "Creating destination directory...");
         Directory.CreateDirectory(config.DestinationPath);
@@ -64,7 +63,8 @@ public static class Commit
         logger?.Status(acdPath, "Copying ACD to temp path...");
         var tempAcdFile = TempFile.CopyToTempPath(acdPath);
         var tempL5xFile = TempFile.FromTempFileWithNewExtension(tempAcdFile, ".L5X");
-        await ConvertAcdToL5x(tempAcdFile.Path, tempL5xFile.Path);
+
+        await LogixProjectConverter.ConvertAsync(tempAcdFile.Path, tempL5xFile.Path, logger: logger, overwrite: false);
 
         logger?.Status(tempL5xFile.Path, "l5xploding L5X...");
         ExplodeL5x(tempL5xFile.Path, config.DestinationPath);
@@ -115,17 +115,5 @@ public static class Commit
 
         using var inputStream = new FileStream(l5xFilePath, FileMode.Open, FileAccess.Read);
         L5xExploder.Explode(inputStream, config, persistenceHandler);
-    }
-
-    static async Task ConvertAcdToL5x(string acdFilePath, string l5xFilePath)
-    {
-        using LogixProject project = await LogixProject.OpenLogixProjectAsync(acdFilePath, new StdOutEventLogger());
-        await project.SaveAsAsync(l5xFilePath);
-
-        var fileBytes = new FileInfo(l5xFilePath).Length;
-        if (fileBytes == 0)
-        {
-            throw new OperationFailedException("Unable to save project: An unknown error has occured", l5xFilePath);
-        }
     }
 }

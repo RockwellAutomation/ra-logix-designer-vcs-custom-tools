@@ -42,7 +42,7 @@ internal static class UserPrompts
         return config;
     }
 
-    public static L5xGitConfig InitializeConfigPromptIfNeeded(string acdPath, StdOutEventLogger? logger)
+    public static L5xGitConfig InitializeConfigPromptIfNeeded(string acdPath, IOperationEvent? logger)
     {
         var configFilePath = Paths.GetL5xConfigFilePathFromAcdPath(acdPath);
 

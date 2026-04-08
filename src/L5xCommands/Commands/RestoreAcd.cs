@@ -1,7 +1,6 @@
 using L5xGitLib;
 using L5xploderLib;
 using L5xploderLib.Services;
-using RockwellAutomation.LogixDesigner;
 using RockwellAutomation.LogixDesigner.Logging;
 using System.CommandLine;
 using System.Text.RegularExpressions;
@@ -69,7 +68,7 @@ public static class RestoreAcd
                 options: L5xSerializationOptions.LoadFromFile(Paths.GetOptionsFilePath(config.DestinationPath)) ?? L5xSerializationOptions.DefaultOptions));
         logger?.Status(tempL5xFile.Path, "Restoration of L5x complete.");
 
-        await ConvertL5xToAcd(tempL5xFile.Path, tempAcdFile.Path);
+        await LogixProjectConverter.ConvertAsync(tempL5xFile.Path, tempAcdFile.Path, logger: logger);
 
         // Backup the file, same as logix designer would
         if (File.Exists(acdPath))
@@ -78,22 +77,11 @@ public static class RestoreAcd
             File.Copy(acdPath, backupFileName);
         }
 
+        // Ensure the destination directory exists before moving
+        FileHelpers.EnsureDirectoryExists(acdPath);
+
         // Now move the temp file to the original ACD path
         File.Move(tempAcdFile.Path, acdPath, true);
-    }
-
-    static async Task ConvertL5xToAcd(string l5xFilePath, string acdFilePath)
-    {
-        Console.WriteLine($"Converting L5X file '{l5xFilePath}' to ACD file '{acdFilePath}'...");
-        
-        using LogixProject project = await LogixProject.OpenLogixProjectAsync(l5xFilePath, new StdOutEventLogger());
-        await project.SaveAsAsync(acdFilePath, true);
-
-        var fileBytes = new FileInfo(acdFilePath).Length;
-        if (fileBytes == 0)
-        {
-            throw new OperationFailedException("Unable to save project: An unknown error has occured", acdFilePath);
-        }
     }
 
     static string GetAcdBackupFilePath(string acdFilePath)

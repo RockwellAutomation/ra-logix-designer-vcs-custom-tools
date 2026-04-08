@@ -123,6 +123,8 @@ public static class L5xDefaultConfig
         }
     ];
 
+    private static readonly char[] InvalidFileNameChars = Path.GetInvalidFileNameChars();
+
     private static string DefaultNameGenerator(XElement element)
     {
         var baseName = element.Attribute("Name")?.Value;
@@ -130,10 +132,13 @@ public static class L5xDefaultConfig
         {
             return "unnamed_element";
         }
-        else
+
+        foreach (var invalidChar in InvalidFileNameChars)
         {
-            return $"{baseName}";
+            baseName = baseName.Replace(invalidChar, '_');
         }
+
+        return baseName;
     }
 
     private static IList<XElement> SortAddOnInstructions(IEnumerable<XElement> addOnInstructions)

@@ -37,8 +37,68 @@ public static class Commit
     private static async Task Execute(string acdPath, bool unsafeSkipDependencyCheck)
     {
         var logger = new StdOutEventLogger();
-        var config = UserPrompts.InitializeConfigPromptIfNeeded(acdPath, logger);
+        var configFilePath = Paths.GetL5xConfigFilePathFromAcdPath(acdPath);
 
+        logger?.Status(configFilePath, "Loading configuration file...");
+        var config = L5xGitConfig.LoadFromFile(configFilePath);
+
+        if (config is null)
+        {
+            logger?.Status(configFilePath, "Configuration file not found...");
+            Console.WriteLine("Configuration file not found.");
+
+            var destPath = UserPrompts.PromptForCommitRestoreDirectory();
+
+            var gitService = EnsureGitRepo(destPath, logger);
+            if (gitService is null)
+                return;
+
+            var promptForCommitMessage = UserPrompts.PromptForCommitMessageRequiredOnEachCommit();
+
+            config = new L5xGitConfig
+            {
+                DestinationPath = destPath,
+                PromptForCommitMessage = promptForCommitMessage,
+            };
+
+            logger?.Status(configFilePath, "Saving configuration file...");
+            config.Save(configFilePath);
+
+            await RunCommit(acdPath, config, gitService, logger, unsafeSkipDependencyCheck);
+        }
+        else
+        {
+            // Existing config — ensure git repo still exists.
+            var gitService = EnsureGitRepo(config.DestinationPath, logger);
+            if (gitService is null)
+                return;
+
+            await RunCommit(acdPath, config, gitService, logger, unsafeSkipDependencyCheck);
+        }
+    }
+
+    private static IGitService? EnsureGitRepo(string destinationPath, IOperationEvent? logger)
+    {
+        var gitService = GitService.Create(destinationPath);
+        if (gitService is null)
+        {
+            if (UserPrompts.PromptToCreateAndInitGitRepo(destinationPath))
+            {
+                logger?.Status(destinationPath, "Initializing new Git repository...");
+                gitService = GitService.Init(destinationPath);
+                logger?.Status(destinationPath, "Git repository initialized.");
+            }
+            else
+            {
+                logger?.Error(destinationPath, "No Git repository found. Unable to commit changes.");
+                return null;
+            }
+        }
+        return gitService;
+    }
+
+    private static async Task RunCommit(string acdPath, L5xGitConfig config, IGitService gitService, IOperationEvent? logger, bool unsafeSkipDependencyCheck)
+    {
         await PathGuard.Guard(
             path: config.DestinationPath,
             millisecondsTimeout: 0,
@@ -46,15 +106,12 @@ public static class Commit
             action: async () =>
             {
                 var commitMessage = UserPrompts.GetCommitMessagePromptIfNeeded(config);
-                await CommitFromAcd(acdPath, config, commitMessage, logger, unsafeSkipDependencyCheck);
+                await CommitFromAcd(acdPath, config, commitMessage, gitService, logger, unsafeSkipDependencyCheck);
             });
     }
 
-    private static async Task<bool> CommitFromAcd(string acdPath, L5xGitConfig config, string commitMessage, IOperationEvent? logger, bool unsafeSkipDependencyCheck)
+    private static async Task<bool> CommitFromAcd(string acdPath, L5xGitConfig config, string commitMessage, IGitService gitService, IOperationEvent? logger, bool unsafeSkipDependencyCheck)
     {
-        logger?.Status(config.DestinationPath, "Creating destination directory...");
-        Directory.CreateDirectory(config.DestinationPath);
-
         logger?.Status(acdPath, "Copying ACD to temp path...");
         var tempAcdFile = TempFile.CopyToTempPath(acdPath);
         var tempL5xFile = TempFile.FromTempFileWithNewExtension(tempAcdFile, ".L5X");
@@ -67,12 +124,6 @@ public static class Commit
         logger?.Status(config.DestinationPath, "Committing to Git repository...");
 
         logger?.Status(config.DestinationPath, "Commit message is:" + System.Environment.NewLine + commitMessage);
-        var gitService = GitService.Create(config.DestinationPath);
-        if (gitService is null)
-        {
-            logger?.Error(config.DestinationPath, "No Git repository found. Please ensure you are targetting a valid Git repository.  Unable to commit changes.");
-            return false;
-        }
 
         var staged = gitService.Stage(config.DestinationPath);
         if (!staged)
@@ -80,7 +131,7 @@ public static class Commit
             logger?.Error(config.DestinationPath, "Repository is not in an appropriate state to stage changes.");
             return false;
         }
-        var commit = gitService.Commit(commitMessage);
+        var commit = await gitService.CommitAsync(commitMessage);
         if (commit is null)
         {
             logger?.Error(config.DestinationPath, "No changes to commit.");

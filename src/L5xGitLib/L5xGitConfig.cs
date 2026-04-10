@@ -28,7 +28,9 @@ public sealed class L5xGitConfig
         }
 
         var yaml = File.ReadAllText(filePath);
-        var deserializer = new DeserializerBuilder().Build();
+        var deserializer = new DeserializerBuilder()
+            .IgnoreUnmatchedProperties()
+            .Build();
         return deserializer.Deserialize<L5xGitConfig>(yaml);
     }
 }

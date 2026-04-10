@@ -29,8 +29,8 @@ files to/from a more git-appropriate format, and even commit / diff those change
 Clone the repository and build:
 
 ```sh
-git clone <your-repo-url>
-cd <clone_dir>
+git clone https://github.com/RockwellAutomation/ra-logix-designer-vcs-custom-tools.git
+cd ra-logix-designer-vcs-custom-tools
 dotnet build -c Release
 ```
 
@@ -103,8 +103,14 @@ l5xgit commit --acd path/to/project.ACD --unsafe-skip-dependency-check
 Some level of integration with Logix Designer can be achieved by using Custom Tools xml which is produced during the build
 configured to point to the build output path.
 
-`artifacts\bin\release\Assets\CustomToolsMenu.xml` can be coped to: `C:\Program Files (x86)\Rockwell Software\RSLogix 5000\Common\CustomToolsMenu.xml`
+`artifacts\bin\release\Assets\CustomToolsMenu.xml` can be copied to: `C:\Program Files (x86)\Rockwell Software\RSLogix 5000\Common\CustomToolsMenu.xml`
 to install the custom tools globally within Logix Designer.
+
+A script is provided which self-elevates to Administrator and performs the copy:
+
+```powershell
+.\Install-CustomToolsMenu.ps1
+```
 
 
 ## Testing

@@ -2,7 +2,7 @@ using LibGit2Sharp;
 
 namespace L5xGitLib.Services;
 
-public sealed class GitService : IDisposable
+public sealed class GitService : IGitService
 {
     public string RepoRoot => repo.Info.WorkingDirectory ?? string.Empty;
     private readonly Repository repo;
@@ -13,7 +13,7 @@ public sealed class GitService : IDisposable
         repo = new Repository(repoPath);
     }
 
-    public static GitService? Create(string folderPath)
+    public static IGitService? Create(string folderPath)
     {
         var repoPath = Repository.Discover(folderPath);
         if (repoPath == null || !Repository.IsValid(repoPath))
@@ -21,6 +21,17 @@ public sealed class GitService : IDisposable
             return null;
         }
 
+        return new GitService(repoPath);
+    }
+
+    /// <summary>
+    /// Initializes a new Git repository at the specified folder path.
+    /// Creates the directory if it does not exist.
+    /// </summary>
+    public static IGitService Init(string folderPath)
+    {
+        Directory.CreateDirectory(folderPath);
+        var repoPath = Repository.Init(folderPath);
         return new GitService(repoPath);
     }
 
@@ -48,7 +59,7 @@ public sealed class GitService : IDisposable
         await Task.Run(() => Stage(folderPath));
     }
 
-    public Commit? Commit(string commitMessage)
+    public GitCommitResult? Commit(string commitMessage)
     {
         if (disposed)
         {
@@ -76,10 +87,11 @@ public sealed class GitService : IDisposable
         var author = new Signature(name, email, DateTimeOffset.Now);
         var committer = author;
 
-        return repo.Commit(commitMessage, author, committer);
+        var commit = repo.Commit(commitMessage, author, committer);
+        return new GitCommitResult(commit.Sha);
     }
 
-    public async Task<Commit?> CommitAsync(string commitMessage)
+    public async Task<GitCommitResult?> CommitAsync(string commitMessage)
     {
         return await Task.Run(() => Commit(commitMessage));
     }

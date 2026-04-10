@@ -2,7 +2,7 @@
 	<CustomTool>
 		<Command>@@OUTDIR@@l5xgit.exe</Command>
 		<WorkingDirectory></WorkingDirectory>
-		<Arguments>commit --acd "%project_path%" --pause</Arguments>
+		<Arguments>commit --acd "%project_path%" --pause-if-error</Arguments>
 		<ToolName>Commit</ToolName>
 		<StatusBarText>Commit to Git</StatusBarText>
 		<ToolbarIcon IconIndex="0">@@OUTDIR@@\Assets\commit.bmp</ToolbarIcon>
@@ -18,7 +18,7 @@
 	<CustomTool>
 		<Command>@@OUTDIR@@\l5xgit.exe</Command>
 		<WorkingDirectory></WorkingDirectory>
-		<Arguments>restoreacd --pause</Arguments>
+		<Arguments>restoreacd --pause-if-error</Arguments>
 		<ToolName>Restore</ToolName>
 		<StatusBarText>Launch l5xgit.exe</StatusBarText>
 		<ToolbarIcon IconIndex="0">@@OUTDIR@@\Assets\pull.bmp</ToolbarIcon>
@@ -26,7 +26,7 @@
 	<CustomTool>
 		<Command>@@OUTDIR@@\l5xgit.exe</Command>
 		<WorkingDirectory></WorkingDirectory>
-		<Arguments>restoreacd --acd "%project_path%" --pause</Arguments>
+		<Arguments>restoreacd --acd "%project_path%" --pause-if-error</Arguments>
 		<ToolName>RestoreCurrentFile</ToolName>
 		<StatusBarText>Launch l5xgit.exe</StatusBarText>
 		<ToolbarIcon IconIndex="0">@@OUTDIR@@\Assets\pull.bmp</ToolbarIcon>

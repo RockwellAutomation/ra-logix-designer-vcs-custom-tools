@@ -109,6 +109,13 @@ internal static class UserPrompts
         return PromptYesNo("Would you like to be prompted for a commit message for each commit?");
     }
 
+    public static bool PromptToCreateAndInitGitRepo(string directory)
+    {
+        Console.WriteLine("");
+        Console.WriteLine($"No Git repository found at '{directory}'.");
+        return PromptYesNo("Would you like to create the directory and initialize a new Git repository?");
+    }
+
     public static string PromptForCommitMessage()
     {
         Console.WriteLine("");
@@ -202,10 +209,10 @@ internal static class UserPrompts
     private static string PromptForDirectory(string prompt, bool mustExist = false)
     {
         string? path;
+        ReadLine.AutoCompletionHandler = new DirectoryAutoCompleteHandler();
         do
         {
-            Console.Write(prompt);
-            path = Console.ReadLine()?.Trim();
+            path = ReadLine.Read(prompt)?.Trim();
 
             if (string.IsNullOrWhiteSpace(path))
             {

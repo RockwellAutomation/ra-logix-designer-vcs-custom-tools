@@ -50,7 +50,9 @@ public sealed class L5xSerializationOptions
         }
 
         var yaml = File.ReadAllText(filePath);
-        var deserializer = new DeserializerBuilder().Build();
+        var deserializer = new DeserializerBuilder()
+            .IgnoreUnmatchedProperties()
+            .Build();
         return deserializer.Deserialize<L5xSerializationOptions>(yaml);
     }
 }

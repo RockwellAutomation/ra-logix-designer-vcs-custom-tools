@@ -59,7 +59,7 @@ public static class Difftool
 
         // run a git difftool --dir-diff HEAD~1 command, unfortunately lib2git does not help us here
         // we just use the git CLI
-        var diffCommand = $"difftool --dir-diff HEAD~1 --no-prompt";
+        var diffCommand = $"difftool HEAD~1 HEAD --dir-diff  --no-prompt";
         var startInfo = new System.Diagnostics.ProcessStartInfo
         {
             FileName = "git",

@@ -18,6 +18,7 @@ Describe 'l5xgit CLI' {
     Context 'help output' {
         It 'shows help text listing available subcommands' {
             $result = Invoke-L5xgit @('--help')
+            $result.ExitCode | Should -Be 0
             $result.StdOut | Should -Match 'l5xgit'
             $result.StdOut | Should -Match 'explode'
             $result.StdOut | Should -Match 'implode'
@@ -28,6 +29,7 @@ Describe 'l5xgit CLI' {
     Context 'unknown subcommand' {
         It 'reports an error on stderr' {
             $result = Invoke-L5xgit @('bogus')
+            $result.ExitCode | Should -Not -Be 0
             $result.StdErr | Should -Match 'Unrecognized command or argument'
         }
     }
@@ -37,6 +39,7 @@ Describe 'l5xgit CLI' {
             $tempDir = New-TestTempDir -Prefix 'l5xgit_cli'
             try {
                 $result = Invoke-L5xgit @('explode', '--dir', $tempDir)
+                $result.ExitCode | Should -Not -Be 0
                 $result.StdErr | Should -Match "--l5x.*required|required.*--l5x"
             }
             finally {
@@ -48,6 +51,7 @@ Describe 'l5xgit CLI' {
         It 'reports error when --dir is missing' {
             $l5xFile = Join-Path $fixturesDir 'sample_with_dependencies.L5X'
             $result = Invoke-L5xgit @('explode', '--l5x', $l5xFile)
+            $result.ExitCode | Should -Not -Be 0
             $result.StdErr | Should -Match "--dir.*required|required.*--dir"
         }
     }
@@ -57,6 +61,7 @@ Describe 'l5xgit CLI' {
             $tempDir = New-TestTempDir -Prefix 'l5xgit_cli'
             try {
                 $result = Invoke-L5xgit @('implode', '--dir', $tempDir)
+                $result.ExitCode | Should -Not -Be 0
                 $result.StdErr | Should -Match "--l5x.*required|required.*--l5x"
             }
             finally {
@@ -67,6 +72,7 @@ Describe 'l5xgit CLI' {
 
         It 'reports error when --dir is missing' {
             $result = Invoke-L5xgit @('implode', '--l5x', 'output.L5X')
+            $result.ExitCode | Should -Not -Be 0
             $result.StdErr | Should -Match "--dir.*required|required.*--dir"
         }
     }

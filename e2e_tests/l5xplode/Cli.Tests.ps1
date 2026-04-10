@@ -20,6 +20,7 @@ Describe 'l5xplode CLI validation' {
             $tempDir = New-TestTempDir -Prefix 'l5xplode_cli'
             try {
                 $result = Invoke-L5xplode @('explode', '--dir', $tempDir)
+                $result.ExitCode | Should -Not -Be 0
                 $result.StdErr | Should -Match "--l5x.*required|required.*--l5x"
             }
             finally {
@@ -31,6 +32,7 @@ Describe 'l5xplode CLI validation' {
         It 'reports error when --dir is not provided' {
             $l5xFile = Join-Path $fixturesDir 'sample_with_dependencies.L5X'
             $result = Invoke-L5xplode @('explode', '--l5x', $l5xFile)
+            $result.ExitCode | Should -Not -Be 0
             $result.StdErr | Should -Match "--dir.*required|required.*--dir"
         }
     }
@@ -40,6 +42,7 @@ Describe 'l5xplode CLI validation' {
             $tempDir = New-TestTempDir -Prefix 'l5xplode_cli'
             try {
                 $result = Invoke-L5xplode @('explode', '--l5x', 'C:\nonexistent\file.L5X', '--dir', $tempDir, '--force')
+                $result.ExitCode | Should -Not -Be 0
                 $result.StdErr | Should -Not -BeNullOrEmpty
             }
             finally {
@@ -56,6 +59,7 @@ Describe 'l5xplode CLI validation' {
             Set-Content -Path $txtFile -Value 'hello'
             try {
                 $result = Invoke-L5xplode @('explode', '--l5x', $txtFile, '--dir', $tempDir, '--force')
+                $result.ExitCode | Should -Not -Be 0
                 $result.StdErr | Should -Not -BeNullOrEmpty
             }
             finally {
@@ -68,6 +72,7 @@ Describe 'l5xplode CLI validation' {
     Context 'implode with missing required options' {
         It 'reports error when --dir is not provided' {
             $result = Invoke-L5xplode @('implode', '--l5x', 'output.L5X')
+            $result.ExitCode | Should -Not -Be 0
             $result.StdErr | Should -Match "--dir.*required|required.*--dir"
         }
 
@@ -75,6 +80,7 @@ Describe 'l5xplode CLI validation' {
             $tempDir = New-TestTempDir -Prefix 'l5xplode_cli'
             try {
                 $result = Invoke-L5xplode @('implode', '--dir', $tempDir)
+                $result.ExitCode | Should -Not -Be 0
                 $result.StdErr | Should -Match "--l5x.*required|required.*--l5x"
             }
             finally {
@@ -94,6 +100,7 @@ Describe 'l5xplode CLI validation' {
     Context 'unknown subcommand' {
         It 'reports an error on stderr' {
             $result = Invoke-L5xplode @('bogus')
+            $result.ExitCode | Should -Not -Be 0
             $result.StdErr | Should -Match 'Unrecognized command or argument'
         }
     }
